@@ -6,12 +6,12 @@ SRC		=	$(wildcard ./src/*.c)
 OBJ		=	$(SRC:.c=.o)
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) -c $< -o $@ $(CFLAGS)
 
 all: $(TARGET)
 
 $(TARGET) : $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o $(TARGET)
+	$(CC) $(OBJ) -o $(TARGET) $(CFLAGS)
 
 clean:
 	$(RM) $(OBJ)
