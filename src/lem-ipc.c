@@ -20,6 +20,8 @@ bool    is_first_process(void)
 
 int     main(int ac, char **av)
 {
+    int team = 0;
+
     if (!set_signal())
         return 1;
     if (is_first_process()) {
@@ -28,6 +30,13 @@ int     main(int ac, char **av)
             return 2;
         }
         display();
+    } else {
+        if (ac < 2 || !(team = ft_atoi(av[1])) ||
+            (team < 1 || team > 7) || !get_resources())
+            return 3;
+        resources.is_display = 0;
+        resources.teams[team] += 1;
+        resources.teamid = team;
     }
     exit_handler(0);
 }
