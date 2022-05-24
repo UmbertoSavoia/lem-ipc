@@ -33,9 +33,9 @@ void    draw_board(void)
         mvaddch(i, 0, ' ' | COLOR_PAIR(7));
         mvaddch(i, WIDTH+1, ' ' | COLOR_PAIR(7));
     }
-    for (char i = 0; i < HEIGHT; ++i)
-        for (char j = 0; j < WIDTH; ++j)
-            mvaddch(i+1, j+1, ' ' | COLOR_PAIR(2));
+    for (char y = 0; y < HEIGHT; ++y)
+        for (char x = 0; x < WIDTH; ++x)
+            mvaddch(y+1, x+1, ' ' | COLOR_PAIR(resources.board[y * WIDTH + x]));
 }
 
 void    display(void)
