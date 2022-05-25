@@ -22,13 +22,12 @@ int     main(int ac, char **av)
 {
     int team = 0;
 
+    srand(time(0));
     if (!set_signal())
         return 1;
     if (is_first_process()) {
-        if (!create_resources()) {
-            clean_resources();
+        if (!create_resources() && clean_resources())
             return 2;
-        }
         display();
     } else {
         if (ac < 2 || !(team = ft_atoi(av[1])) ||
@@ -37,6 +36,10 @@ int     main(int ac, char **av)
         resources.is_display = 0;
         resources.teams[team] += 1;
         resources.teamid = team;
+        if (create_player())
+            start_player();
+        else
+            puts("Il giocatore non può essere aggiunto!");
     }
     exit_handler(0);
 }

@@ -38,7 +38,7 @@ void    draw_board(void)
         for (char x = 0; x < WIDTH; ++x)
             mvaddch(y+1, x+1, ' ' | COLOR_PAIR(resources.board[y * WIDTH + x]));
     for (char i = 1; i < 8; ++i) {
-        if (resources.teams[i]) {
+        if (resources.teams[i] > 0) {
             mvaddch(5+i, WIDTH+10, ' ' | COLOR_PAIR(i));
             mvprintw(5+i, WIDTH+11, " Team %d - Giocatori: %d", i, resources.teams[i]);
         }
@@ -59,23 +59,33 @@ char    winner_check(void)
     return (ret != 1) ? 0 : team;
 }
 
+void    msg_handler(t_msgbuf *msg)
+{
+    char        winner = 0;
+
+    if (!ft_memcmp(msg->msg.str, MSG_DIED, ft_strlen(MSG_DIED))) {
+        resources.teams[msg->msg.team] -= 1;
+        if ((winner = winner_check()) > 0) {
+            mvprintw(HEIGHT / 2, WIDTH / 2, "Il team %d ha VINTO!!!", winner);
+            //sleep(4);
+            //exit_handler(0);
+        }
+    } else if (!ft_memcmp(msg->msg.str, MSG_NEW, ft_strlen(MSG_NEW))) {
+        resources.teams[msg->msg.team] += 1;
+    }
+}
+
 void    display(void)
 {
     t_msgbuf    msg = {0};
-    char        winner = 0;
 
     init_ncurses();
     while (1) {
+        clear();
         draw_board();
         refresh();
         if (msgrcv(resources.msqid, &msg, sizeof msg.msg, 0, 0) == -1)
             break;
-        if (!ft_memcmp(msg.msg.str, DIED, ft_strlen(DIED))) {
-            resources.teams[msg.msg.team] -= 1;
-            if ((winner = winner_check()) > 0) {
-                mvprintw(HEIGHT / 2, WIDTH / 2, "Il team %d ha VINTO!!!", winner);
-                sleep(4);
-            }
-        }
+        msg_handler(&msg);
     }
 }

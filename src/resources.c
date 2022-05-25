@@ -58,7 +58,7 @@ bool    get_resources(void)
     return TRUE;
 }
 
-void    clean_resources(void)
+int    clean_resources(void)
 {
     shmdt(resources.board);
     if (resources.is_display) {
@@ -67,4 +67,5 @@ void    clean_resources(void)
         semctl(resources.semid, IPC_RMID, 0);
     }
     endwin();
+    return 1;
 }
