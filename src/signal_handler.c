@@ -2,6 +2,8 @@
 
 void    exit_handler(int sig)
 {
+    if (!resources.is_display && !resources.player_dead)
+        player_dead();
     clean_resources();
     exit(0);
 }

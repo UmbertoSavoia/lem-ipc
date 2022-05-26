@@ -24,7 +24,7 @@ void    init_ncurses(void)
     }
 }
 
-void    draw_board(void)
+void    draw_borders(void)
 {
     for (int i = 0; i < WIDTH+1; ++i) {
         mvaddch(0, i, ' ' | COLOR_PAIR(7));
@@ -34,6 +34,10 @@ void    draw_board(void)
         mvaddch(i, 0, ' ' | COLOR_PAIR(7));
         mvaddch(i, WIDTH+1, ' ' | COLOR_PAIR(7));
     }
+}
+
+void    draw_board(void)
+{
     for (char y = 0; y < HEIGHT; ++y)
         for (char x = 0; x < WIDTH; ++x)
             mvaddch(y+1, x+1, ' ' | COLOR_PAIR(resources.board[y * WIDTH + x]));
@@ -41,7 +45,9 @@ void    draw_board(void)
         if (resources.teams[i] > 0) {
             mvaddch(5+i, WIDTH+10, ' ' | COLOR_PAIR(i));
             mvprintw(5+i, WIDTH+11, " Team %d - Giocatori: %d", i, resources.teams[i]);
-        }
+        } else {
+            mvprintw(5+i, WIDTH+10, "                       ");
+        };
     }
 }
 
@@ -80,8 +86,10 @@ void    display(void)
     t_msgbuf    msg = {0};
 
     init_ncurses();
+    draw_borders();
+
     while (1) {
-        clear();
+        //clear();
         draw_board();
         refresh();
         if (msgrcv(resources.msqid, &msg, sizeof msg.msg, 0, 0) == -1)

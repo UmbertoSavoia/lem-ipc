@@ -20,6 +20,7 @@
 
 #define MSG_DIED    "DIED"
 #define MSG_NEW     "NEW"
+#define MSG_REFRESH "REFRESH"
 
 union semun {
     int val;
@@ -48,6 +49,7 @@ typedef struct  s_resources
     bool    is_display;
     int     teams[8];
     char    teamid;
+    bool    player_dead;
     int     x;
     int     y;
 }               t_resources;
@@ -75,6 +77,7 @@ bool    sem_post_systemv(void);
  * display.c
  */
 void    init_ncurses(void);
+void    draw_borders(void);
 void    draw_board(void);
 char    winner_check(void);
 void    msg_handler(t_msgbuf *msg);
@@ -84,8 +87,15 @@ void    display(void);
  * player.c
  */
 bool    check_space_player(void);
+char    check_surrounded(void);
 void    start_player(void);
 bool    create_player(void);
+void    play(void);
+void    new_pos_player(int x, int y);
+void    player_dead(void);
+void    find_enemy(int *_x, int *_y);
+void    send_refresh(void);
+char    check_surrounded(void);
 
 /**
  * resources.c
