@@ -31,6 +31,7 @@ union semun {
 typedef struct  s_msg
 {
     int     team;
+    int     pid;
     char    str[256];
 }               t_msg;
 
@@ -48,6 +49,7 @@ typedef struct  s_resources
     char    *board;
     bool    is_display;
     int     teams[8];
+    int     pids[SIZE_BOARD];
     char    teamid;
     bool    player_dead;
     int     x;
@@ -81,6 +83,9 @@ void    draw_borders(void);
 void    draw_board(void);
 char    winner_check(void);
 void    msg_handler(t_msgbuf *msg);
+void    remove_pid(int pid);
+void    add_pid(int pid);
+void    send_finish(void);
 void    display(void);
 
 /**

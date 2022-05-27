@@ -65,19 +65,51 @@ char    winner_check(void)
     return (ret != 1) ? 0 : team;
 }
 
+void    remove_pid(int pid)
+{
+    for (int i = 0; i < SIZE_BOARD; ++i) {
+        if (resources.pids[i] == pid) {
+            resources.pids[i] = 0;
+            break;
+        }
+    }
+}
+
+void    add_pid(int pid)
+{
+    for (int i = 0; i < SIZE_BOARD; ++i) {
+        if (resources.pids[i] == 0) {
+            resources.pids[i] = pid;
+            break;
+        }
+    }
+}
+
+void    send_finish(void)
+{
+    for (int i = 0; i < SIZE_BOARD; ++i) {
+        if (resources.pids[i] != 0)
+            kill(resources.pids[i], SIGINT);
+    }
+}
+
 void    msg_handler(t_msgbuf *msg)
 {
     char        winner = 0;
 
     if (!ft_memcmp(msg->msg.str, MSG_DIED, ft_strlen(MSG_DIED))) {
         resources.teams[msg->msg.team] -= 1;
+        remove_pid(msg->msg.pid);
         if ((winner = winner_check()) > 0) {
             mvprintw(HEIGHT / 2, WIDTH / 2, "Il team %d ha VINTO!!!", winner);
-            //sleep(4);
-            //exit_handler(0);
+            refresh();
+            send_finish();
+            sleep(4);
+            exit_handler(0);
         }
     } else if (!ft_memcmp(msg->msg.str, MSG_NEW, ft_strlen(MSG_NEW))) {
         resources.teams[msg->msg.team] += 1;
+        add_pid(msg->msg.pid);
     }
 }
 

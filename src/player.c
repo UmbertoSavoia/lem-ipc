@@ -28,6 +28,7 @@ bool    create_player(void)
         return FALSE;
     snprintf(msg.msg.str, 256, "%s", MSG_NEW);
     msg.msg.team = resources.teamid;
+    msg.msg.pid = getpid();
     msg.mtype = 2;
     if (msgsnd(resources.msqid, &msg, sizeof(t_msg), 0) < 0)
         return FALSE;
@@ -40,20 +41,31 @@ bool    create_player(void)
  */
 char    check_surrounded(void)
 {
-    int pos = resources.y + WIDTH + resources.x;
     char enemy = 0;
 
     if (resources.x < WIDTH && resources.board[resources.y * WIDTH + (resources.x + 1)] != 0 &&
-        resources.board[resources.y * WIDTH + (resources.x + 1)] != resources.teamid)
+            resources.board[resources.y * WIDTH + (resources.x + 1)] != resources.teamid)
         enemy++;
     if (resources.x > 0 && resources.board[resources.y * WIDTH + (resources.x - 1)] != 0 &&
-        resources.board[resources.y * WIDTH + (resources.x - 1)] != resources.teamid)
+            resources.board[resources.y * WIDTH + (resources.x - 1)] != resources.teamid)
         enemy++;
     if (resources.y < HEIGHT && resources.board[(resources.y + 1) * WIDTH + resources.x] != 0 &&
-        resources.board[(resources.y + 1) * WIDTH + resources.x] != resources.teamid)
+            resources.board[(resources.y + 1) * WIDTH + resources.x] != resources.teamid)
         enemy++;
     if (resources.y > 0 && resources.board[(resources.y - 1) * WIDTH + resources.x] != 0 &&
-        resources.board[(resources.y - 1) * WIDTH + resources.x] != resources.teamid)
+            resources.board[(resources.y - 1) * WIDTH + resources.x] != resources.teamid)
+        enemy++;
+    if (resources.y > 0 && resources.board[(resources.y - 1) * WIDTH + (resources.x - 1)] != 0 &&
+            resources.board[(resources.y - 1) * WIDTH + (resources.x - 1)] != resources.teamid)
+        enemy++;
+    if (resources.y > 0 && resources.board[(resources.y - 1) * WIDTH + (resources.x + 1)] != 0 &&
+            resources.board[(resources.y - 1) * WIDTH + (resources.x + 1)] != resources.teamid)
+        enemy++;
+    if (resources.y < HEIGHT && resources.board[(resources.y + 1) * WIDTH + (resources.x - 1)] != 0 &&
+            resources.board[(resources.y + 1) * WIDTH + (resources.x - 1)] != resources.teamid)
+        enemy++;
+    if (resources.y < HEIGHT && resources.board[(resources.y + 1) * WIDTH + (resources.x + 1)] != 0 &&
+            resources.board[(resources.y + 1) * WIDTH + (resources.x + 1)] != resources.teamid)
         enemy++;
     return enemy;
 }
@@ -88,6 +100,8 @@ void    find_enemy(int *_x, int *_y)
 
 void    new_pos_player(int x, int y)
 {
+    if (resources.board[y * WIDTH + x] != 0)
+        return;
     sem_wait_systemv();
     resources.board[resources.y * WIDTH + resources.x] = 0;
     resources.board[y * WIDTH + x] = resources.teamid;
@@ -104,13 +118,17 @@ void    play(void)
 
     find_enemy(&x, &y);
     if (x != -1 && y != -1) {
-        if (x < resources.x && resources.x-1 != x) {
+        if (x < resources.x && resources.x-1 != x &&
+            resources.board[y * WIDTH + x] != resources.teamid) {
             new_pos_player(resources.x-1, resources.y);
-        } else if (x > resources.x && resources.x+1 != x) {
+        } else if (x > resources.x && resources.x+1 != x &&
+            resources.board[y * WIDTH + x] != resources.teamid) {
             new_pos_player(resources.x+1, resources.y);
-        } else if (y < resources.y && resources.y-1 != y) {
+        } else if (y < resources.y && resources.y-1 != y &&
+            resources.board[y * WIDTH + x] != resources.teamid) {
             new_pos_player(resources.x, resources.y-1);
-        } else if (y > resources.y && resources.y+1 != y) {
+        } else if (y > resources.y && resources.y+1 != y &&
+            resources.board[y * WIDTH + x] != resources.teamid) {
             new_pos_player(resources.x, resources.y+1);
         }
     }
@@ -122,6 +140,7 @@ void    player_dead(void)
 
     msg.mtype = 2;
     msg.msg.team = resources.teamid;
+    msg.msg.pid = getpid();
     snprintf(msg.msg.str, 256, "%s", MSG_DIED);
     sem_wait_systemv();
     resources.board[resources.y * WIDTH + resources.x] = 0;
@@ -131,19 +150,17 @@ void    player_dead(void)
 
 void    start_player(void)
 {
+    int enemy = 0;
+
     while (1) {
-        switch (check_surrounded()) {
-            case 0:
-                play();
-                usleep(100000);
-                break;
-            case 1:
-                sleep(1);
-                break;
-            default:
-                resources.player_dead = TRUE;
-                player_dead();
-                return;
+        enemy = check_surrounded();
+        if (!enemy || enemy == 1) {
+            play();
+            usleep(100000);
+        } else {
+            resources.player_dead = TRUE;
+            player_dead();
+            return;
         }
     }
 }
