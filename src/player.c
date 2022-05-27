@@ -41,7 +41,6 @@ bool    create_player(void)
  */
 char    check_surrounded(void)
 {
-    //char enemy = 0;
     char enemy[8] = {0};
 
     if (resources.x < WIDTH && resources.board[resources.y * WIDTH + (resources.x + 1)] != 0 &&
