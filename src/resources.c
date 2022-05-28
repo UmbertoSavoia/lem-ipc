@@ -62,6 +62,7 @@ int    clean_resources(void)
 {
     shmdt(resources.board);
     if (resources.is_display) {
+        send_finish();
         msgctl(resources.msqid, IPC_RMID, 0);
         shmctl(resources.shmid, IPC_RMID, 0);
         semctl(resources.semid, IPC_RMID, 0);

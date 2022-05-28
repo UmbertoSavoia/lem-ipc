@@ -103,7 +103,6 @@ void    msg_handler(t_msgbuf *msg)
         if ((winner = winner_check()) > 0) {
             mvprintw(HEIGHT / 2, WIDTH / 2, "Il team %d ha VINTO!!!", winner);
             refresh();
-            send_finish();
             sleep(4);
             exit_handler(0);
         }
