@@ -41,33 +41,37 @@ bool    create_player(void)
  */
 char    check_surrounded(void)
 {
-    char enemy = 0;
+    char enemy[8] = {0};
 
     if (resources.x < WIDTH && resources.board[resources.y * WIDTH + (resources.x + 1)] != 0 &&
             resources.board[resources.y * WIDTH + (resources.x + 1)] != resources.teamid)
-        enemy++;
+        enemy[resources.board[resources.y * WIDTH + (resources.x + 1)]]++;
     if (resources.x > 0 && resources.board[resources.y * WIDTH + (resources.x - 1)] != 0 &&
             resources.board[resources.y * WIDTH + (resources.x - 1)] != resources.teamid)
-        enemy++;
+        enemy[resources.board[resources.y * WIDTH + (resources.x - 1)]]++;
     if (resources.y < HEIGHT && resources.board[(resources.y + 1) * WIDTH + resources.x] != 0 &&
             resources.board[(resources.y + 1) * WIDTH + resources.x] != resources.teamid)
-        enemy++;
+        enemy[resources.board[(resources.y + 1) * WIDTH + resources.x]]++;
     if (resources.y > 0 && resources.board[(resources.y - 1) * WIDTH + resources.x] != 0 &&
             resources.board[(resources.y - 1) * WIDTH + resources.x] != resources.teamid)
-        enemy++;
+        enemy[resources.board[(resources.y - 1) * WIDTH + resources.x]]++;
     if (resources.y > 0 && resources.board[(resources.y - 1) * WIDTH + (resources.x - 1)] != 0 &&
             resources.board[(resources.y - 1) * WIDTH + (resources.x - 1)] != resources.teamid)
-        enemy++;
+        enemy[resources.board[(resources.y - 1) * WIDTH + (resources.x - 1)]]++;
     if (resources.y > 0 && resources.board[(resources.y - 1) * WIDTH + (resources.x + 1)] != 0 &&
             resources.board[(resources.y - 1) * WIDTH + (resources.x + 1)] != resources.teamid)
-        enemy++;
+        enemy[resources.board[(resources.y - 1) * WIDTH + (resources.x + 1)]]++;
     if (resources.y < HEIGHT && resources.board[(resources.y + 1) * WIDTH + (resources.x - 1)] != 0 &&
             resources.board[(resources.y + 1) * WIDTH + (resources.x - 1)] != resources.teamid)
-        enemy++;
+        enemy[resources.board[(resources.y + 1) * WIDTH + (resources.x - 1)]]++;
     if (resources.y < HEIGHT && resources.board[(resources.y + 1) * WIDTH + (resources.x + 1)] != 0 &&
             resources.board[(resources.y + 1) * WIDTH + (resources.x + 1)] != resources.teamid)
-        enemy++;
-    return enemy;
+        enemy[resources.board[(resources.y + 1) * WIDTH + (resources.x + 1)]]++;
+
+    for (int i = 0; i < 8; ++i)
+        if (enemy[i] >= 2)
+            return enemy[i];
+    return 0;
 }
 
 void    send_refresh(void)

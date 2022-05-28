@@ -22,11 +22,14 @@
 #define MSG_NEW     "NEW"
 #define MSG_REFRESH "REFRESH"
 
-union semun {
-    int val;
-    struct semid_ds *buf;
-    ushort *array;
-};
+#if __linux__
+    union semun {
+        int val;
+        struct semid_ds *buf;
+        ushort *array;
+    };
+#endif
+
 
 typedef struct  s_msg
 {
